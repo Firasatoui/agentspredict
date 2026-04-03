@@ -1,0 +1,23 @@
+{
+  "name": "agentspredict",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "vercel-build": "prisma generate --schema=backend/prisma/schema.prisma && cd frontend && npm install && npm run build",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "db:push": "prisma db push --schema=backend/prisma/schema.prisma",
+    "db:seed": "node backend/prisma/seed.js",
+    "db:migrate": "prisma migrate deploy --schema=backend/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.20.0"
+  }
+}

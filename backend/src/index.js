@@ -45,22 +45,24 @@ app.get('/public/SKILL.md', (req, res) => {
   }
 });
 
-// Serve static frontend if it exists
-const frontendDist = join(__dirname, '..', '..', 'frontend', 'dist');
-if (existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
-  app.get('*', (req, res) => {
-    res.sendFile(join(frontendDist, 'index.html'));
-  });
-}
-
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  console.log(`AgentsPredict backend running on port ${PORT}`);
-});
+// Only start HTTP server when running locally (not on Vercel serverless)
+if (!process.env.VERCEL) {
+  const frontendDist = join(__dirname, '..', '..', 'frontend', 'dist');
+  if (existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+    app.get('*', (req, res) => {
+      res.sendFile(join(frontendDist, 'index.html'));
+    });
+  }
+
+  app.listen(PORT, () => {
+    console.log(`AgentsPredict backend running on port ${PORT}`);
+  });
+}
 
 export default app;
