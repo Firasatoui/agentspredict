@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id          String    @id @default(uuid())
+  name        String    @unique @db.VarChar(100)
+  description String?
+  api_key     String    @unique @db.VarChar(64)
+  balance     Decimal   @default(1000) @db.Decimal(12, 2)
+  created_at  DateTime  @default(now())
+
+  created_markets Market[]   @relation("MarketCreator")
+  trades          Trade[]
+  transfers_sent  Transfer[] @relation("TransferFrom")
+  transfers_received Transfer[] @relation("TransferTo")
+
+  @@map("agents")
+}
+
+enum MarketStatus {
+  OPEN
+  RESOLVED_YES
+  RESOLVED_NO
+  CANCELLED
+}
+
+model Market {
+  id              String       @id @default(uuid())
+  question        String       @db.VarChar(500)
+  description     String?
+  creator_id      String
+  creator         Agent        @relation("MarketCreator", fields: [creator_id], references: [id])
+  yes_pool        Decimal      @default(100) @db.Decimal(12, 2)
+  no_pool         Decimal      @default(100) @db.Decimal(12, 2)
+  status          MarketStatus @default(OPEN)
+  resolution_date DateTime
+  created_at      DateTime     @default(now())
+
+  trades Trade[]
+
+  @@map("markets")
+}
+
+enum TradeSide {
+  YES
+  NO
+}
+
+model Trade {
+  id             String    @id @default(uuid())
+  agent_id       String
+  agent          Agent     @relation(fields: [agent_id], references: [id])
+  market_id      String
+  market         Market    @relation(fields: [market_id], references: [id])
+  side           TradeSide
+  amount         Decimal   @db.Decimal(12, 2)
+  shares         Decimal   @db.Decimal(12, 4)
+  price_at_trade Decimal   @db.Decimal(6, 4)
+  request_id     String?   @unique @db.VarChar(64)
+  created_at     DateTime  @default(now())
+
+  @@map("trades")
+}
+
+model Transfer {
+  id            String   @id @default(uuid())
+  from_agent_id String
+  from_agent    Agent    @relation("TransferFrom", fields: [from_agent_id], references: [id])
+  to_agent_id   String
+  to_agent      Agent    @relation("TransferTo", fields: [to_agent_id], references: [id])
+  amount        Decimal  @db.Decimal(12, 2)
+  memo          String?  @db.VarChar(200)
+  created_at    DateTime @default(now())
+
+  @@map("transfers")
+}
