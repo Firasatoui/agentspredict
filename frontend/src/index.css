@@ -2,33 +2,209 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --neon-cyan: #22d3ee;
+  --neon-purple: #a78bfa;
+  --neon-gold: #fbbf24;
+  --bg-dark: #030712;
+  --glass: rgba(15, 23, 42, 0.6);
+}
+
 body {
-  @apply bg-slate-900 text-white;
+  background-color: #030712;
+  color: white;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
+/* Glass card */
+.glass {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
-::-webkit-scrollbar-track {
-  @apply bg-slate-800;
+.glass-hover {
+  transition: all 0.3s ease;
 }
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-600 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-500;
+.glass-hover:hover {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(34, 211, 238, 0.35);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.12), 0 0 60px rgba(34, 211, 238, 0.04);
+  transform: translateY(-2px);
 }
 
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color;
-  transition-duration: 150ms;
+/* Glow effects */
+.glow-cyan { box-shadow: 0 0 20px rgba(34,211,238,0.2), 0 0 60px rgba(34,211,238,0.06); }
+.glow-purple { box-shadow: 0 0 20px rgba(167,139,250,0.2), 0 0 60px rgba(167,139,250,0.06); }
+.glow-gold { box-shadow: 0 0 20px rgba(251,191,36,0.2), 0 0 60px rgba(251,191,36,0.06); }
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-gold {
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Neon border */
+.border-cyan { border-color: rgba(34,211,238,0.3); }
+.border-purple { border-color: rgba(167,139,250,0.3); }
+
+/* Animated grid background */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Radial glow overlay */
+.radial-glow {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34,211,238,0.12) 0%, transparent 70%);
+}
+.radial-glow-purple {
+  background: radial-gradient(ellipse 60% 40% at 80% 50%, rgba(167,139,250,0.08) 0%, transparent 70%);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(34,211,238,0.2); }
+  50% { box-shadow: 0 0 30px rgba(34,211,238,0.5), 0 0 60px rgba(34,211,238,0.2); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes scanLine {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(400%); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes borderRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-fadeInUp { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-pulseGlow { animation: pulseGlow 2s ease-in-out infinite; }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+
+/* Shimmer loading */
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* Neon button */
+.btn-neon {
+  background: linear-gradient(135deg, rgba(34,211,238,0.15), rgba(167,139,250,0.15));
+  border: 1px solid rgba(34,211,238,0.4);
+  color: #22d3ee;
+  transition: all 0.3s ease;
+}
+.btn-neon:hover {
+  background: linear-gradient(135deg, rgba(34,211,238,0.25), rgba(167,139,250,0.25));
+  border-color: rgba(34,211,238,0.7);
+  box-shadow: 0 0 20px rgba(34,211,238,0.3);
+}
+
+.btn-solid {
+  background: linear-gradient(135deg, #22d3ee, #a78bfa);
+  color: #030712;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+.btn-solid:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 30px rgba(34,211,238,0.4);
+  transform: translateY(-1px);
+}
+
+/* Live dot */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: pulseGlow 2s ease-in-out infinite;
+  box-shadow: 0 0 6px #4ade80;
+}
+
+/* Neon text glow */
+.text-glow-cyan { text-shadow: 0 0 12px rgba(34,211,238,0.6); }
+.text-glow-purple { text-shadow: 0 0 12px rgba(167,139,250,0.6); }
+
+/* Carousel */
+.carousel-wrapper { overflow: hidden; }
+.carousel-track {
+  display: flex;
+  gap: 16px;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+/* Tab active state */
+.tab-active {
+  background: linear-gradient(135deg, rgba(34,211,238,0.15), rgba(167,139,250,0.1));
+  border-color: rgba(34,211,238,0.5);
+  color: #22d3ee;
+}
+
+/* Price bar */
+.price-bar-yes {
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  box-shadow: 0 0 8px rgba(74,222,128,0.4);
+}
+.price-bar-no {
+  background: linear-gradient(90deg, #f87171, #ef4444);
+  box-shadow: 0 0 8px rgba(248,113,113,0.4);
 }
 
 /* Code blocks */
 pre, code {
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+pre {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(34,211,238,0.15);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* Table hover */
+.tr-hover:hover {
+  background: rgba(34,211,238,0.04);
 }
