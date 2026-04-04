@@ -4,7 +4,10 @@ import { formatNumber } from '../utils'
 
 function CarouselCard({ market }) {
   const navigate = useNavigate()
-  const yesPercent = Math.round((market.yesPrice ?? 0.5) * 100)
+  const yesPrice = market.yesPrice ?? market.yes_price ?? 0.5
+  const yesPercent = Math.round((typeof yesPrice === 'number' ? yesPrice : 0.5) * 100)
+  const tradeCount = market.tradeCount ?? market.trade_count ?? 0
+  const volume = market.totalVolume ?? market.total_volume ?? market.volume ?? null
 
   return (
     <div
@@ -52,8 +55,8 @@ function CarouselCard({ market }) {
       </div>
 
       <div className="flex justify-between text-xs text-slate-500">
-        <span>{formatNumber(market.tradeCount ?? 0)} trades</span>
-        {market.volume != null && <span>Vol ${formatNumber(market.volume, 0)}</span>}
+        <span>{formatNumber(tradeCount)} trades</span>
+        {volume != null && <span>Vol ${formatNumber(volume, 0)}</span>}
       </div>
     </div>
   )

@@ -11,7 +11,6 @@ export default function Dashboard() {
   const [agents, setAgents] = useState([])
   const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
-  const [tick, setTick] = useState(0)
 
   useEffect(() => {
     Promise.all([
@@ -26,14 +25,8 @@ export default function Dashboard() {
     })
   }, [])
 
-  // Ticker animation
-  useEffect(() => {
-    const iv = setInterval(() => setTick(t => t + 1), 100)
-    return () => clearInterval(iv)
-  }, [])
-
-  const totalTrades = activity.filter(a => a.type === 'trade').length
-  const totalVolume = markets.reduce((s, m) => s + (m.volume ?? 0), 0)
+  const totalTrades = agents.reduce((s, a) => s + (a.tradeCount ?? 0), 0)
+  const totalVolume = markets.reduce((s, m) => s + (m.totalVolume ?? m.volume ?? 0), 0)
 
   return (
     <div className="space-y-10">
@@ -79,13 +72,12 @@ export default function Dashboard() {
         {/* Live ticker strip */}
         {!loading && agents.length > 0 && (
           <div className="mt-10 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent, black 10%, black 90%, transparent)' }}>
-            <div className="flex gap-8 text-xs font-mono text-slate-600 whitespace-nowrap"
-              style={{ animation: 'none' }}>
+            <div className="flex gap-8 text-xs font-mono text-slate-600 whitespace-nowrap">
               {agents.map(a => (
                 <span key={a.id} className="flex items-center gap-2">
                   <span style={{ color: '#22d3ee' }}>◈</span>
                   {a.name}
-                  <span style={{ color: '#4ade80' }}>${(a.balance ?? 0).toFixed(0)}</span>
+                  <span style={{ color: '#4ade80' }}>${parseFloat(a.balance ?? 0).toFixed(0)}</span>
                 </span>
               ))}
             </div>
@@ -97,7 +89,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard label="Registered Agents" value={loading ? '…' : formatNumber(agents.length)} icon="🤖" sub="Active trading agents" color="cyan" />
         <StatsCard label="Active Markets" value={loading ? '…' : formatNumber(markets.length)} icon="◈" sub="Open for trading" color="purple" />
-        <StatsCard label="Recent Trades" value={loading ? '…' : formatNumber(totalTrades)} icon="⚡" sub="From activity feed" color="gold" />
+        <StatsCard label="Total Trades" value={loading ? '…' : formatNumber(totalTrades)} icon="⚡" sub="Across all agents" color="gold" />
         <StatsCard label="Total Volume" value={loading ? '…' : `$${formatNumber(totalVolume, 0)}`} icon="📈" sub="Across all markets" color="green" />
       </div>
 

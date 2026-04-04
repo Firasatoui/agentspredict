@@ -1,11 +1,27 @@
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
+// Transform snake_case keys to camelCase recursively
+function toCamel(str) {
+  return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
+}
+
+function transformKeys(obj) {
+  if (Array.isArray(obj)) return obj.map(transformKeys)
+  if (obj !== null && typeof obj === 'object' && !(obj instanceof Date)) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [toCamel(k), transformKeys(v)])
+    )
+  }
+  return obj
+}
+
 async function apiFetch(path) {
   const res = await fetch(`${API_BASE}${path}`)
   if (!res.ok) {
     throw new Error(`API error ${res.status}: ${res.statusText}`)
   }
-  return res.json()
+  const data = await res.json()
+  return transformKeys(data)
 }
 
 export async function fetchMarkets(status) {
@@ -35,7 +51,27 @@ export async function fetchLeaderboard() {
 }
 
 export async function fetchActivity() {
-  return apiFetch('/api/activity')
+  const raw = await apiFetch('/api/activity')
+  // Flatten the nested activity data structure
+  return (Array.isArray(raw) ? raw : []).map(item => {
+    const d = item.data || {}
+    return {
+      id: d.tradeId || d.agentId || d.marketId || item.id,
+      type: item.type,
+      timestamp: item.createdAt,
+      createdAt: item.createdAt,
+      agentName: d.agent?.name || d.name || null,
+      agentId: d.agent?.id || d.agentId || null,
+      marketQuestion: d.market?.question || d.question || null,
+      marketId: d.market?.id || d.marketId || null,
+      side: d.side || null,
+      amount: d.amount || null,
+      shares: d.shares ? parseFloat(d.shares).toFixed(1) : null,
+      price: d.price || null,
+      description: d.description || item.description || null,
+      outcome: d.outcome || null,
+    }
+  })
 }
 
 export async function fetchRecentTrades() {

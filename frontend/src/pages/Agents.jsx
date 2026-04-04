@@ -14,19 +14,19 @@ const COLUMNS = [
 
 function SortIcon({ active, dir }) {
   return (
-    <span className={`ml-1 inline-flex flex-col text-xs leading-none ${active ? 'text-amber-400' : 'text-slate-600'}`}>
-      <span className={dir === 'asc' && active ? 'text-amber-400' : ''}>▲</span>
-      <span className={dir === 'desc' && active ? 'text-amber-400' : ''}>▼</span>
+    <span className={`ml-1 inline-flex flex-col text-xs leading-none ${active ? 'text-cyan-400' : 'text-slate-600'}`}>
+      <span className={dir === 'asc' && active ? 'text-cyan-400' : ''}>▲</span>
+      <span className={dir === 'desc' && active ? 'text-cyan-400' : ''}>▼</span>
     </span>
   )
 }
 
 function SkeletonRow() {
   return (
-    <tr className="animate-pulse border-b border-slate-700">
+    <tr>
       {Array.from({ length: 6 }).map((_, i) => (
         <td key={i} className="py-3 px-4">
-          <div className="h-3 bg-slate-700 rounded w-3/4" />
+          <div className="h-3 shimmer rounded w-3/4" />
         </td>
       ))}
     </tr>
@@ -61,8 +61,9 @@ export default function Agents() {
     let av = a[sortKey], bv = b[sortKey]
     if (av == null) av = ''
     if (bv == null) bv = ''
-    if (typeof av === 'number' && typeof bv === 'number') {
-      return sortDir === 'asc' ? av - bv : bv - av
+    const an = parseFloat(av), bn = parseFloat(bv)
+    if (!isNaN(an) && !isNaN(bn)) {
+      return sortDir === 'asc' ? an - bn : bn - an
     }
     return sortDir === 'asc'
       ? String(av).localeCompare(String(bv))
@@ -79,20 +80,20 @@ export default function Agents() {
       </div>
 
       {error ? (
-        <div className="text-rose-400 text-sm text-center py-12 bg-slate-800 rounded-xl border border-slate-700">
+        <div className="glass rounded-2xl p-12 text-center text-rose-400 text-sm" style={{ border: '1px solid rgba(248,113,113,0.2)' }}>
           Failed to load agents: {error}
         </div>
       ) : (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="glass rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-700 bg-slate-800/80">
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   {COLUMNS.map(col => (
                     <th
                       key={col.key}
                       onClick={() => handleSort(col.key)}
-                      className="text-left py-3 px-4 text-slate-400 font-medium cursor-pointer hover:text-white select-none whitespace-nowrap"
+                      className="text-left py-3 px-4 text-slate-500 font-medium cursor-pointer hover:text-white select-none whitespace-nowrap text-xs uppercase tracking-wider"
                     >
                       {col.label}
                       <SortIcon active={sortKey === col.key} dir={sortDir} />
@@ -100,19 +101,20 @@ export default function Agents() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
+              <tbody>
                 {loading ? (
                   Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
                 ) : sorted.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-500">No agents registered yet</td>
+                    <td colSpan={6} className="py-12 text-center text-slate-600">No agents registered yet</td>
                   </tr>
                 ) : (
                   sorted.map(agent => (
                     <tr
                       key={agent.id}
                       onClick={() => navigate(`/agents/${agent.id}`)}
-                      className="cursor-pointer hover:bg-slate-700/50 transition-colors"
+                      className="cursor-pointer tr-hover transition-colors"
+                      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
                     >
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
@@ -120,7 +122,7 @@ export default function Agents() {
                           <span className="text-white font-medium">{agent.name || agent.id}</span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-slate-400 max-w-xs truncate">
+                      <td className="py-3 px-4 text-slate-500 max-w-xs truncate">
                         {agent.description || '—'}
                       </td>
                       <td className="py-3 px-4 text-slate-300 tabular-nums">
@@ -131,14 +133,14 @@ export default function Agents() {
                       </td>
                       <td className="py-3 px-4">
                         {agent.winRate != null ? (
-                          <span className={`font-medium ${agent.winRate >= 0.5 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          <span className={`font-medium ${parseFloat(agent.winRate) >= 0.5 ? 'text-emerald-400' : 'text-rose-400'}`}>
                             {pct(agent.winRate)}
                           </span>
                         ) : (
-                          <span className="text-slate-500">—</span>
+                          <span className="text-slate-600">—</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-slate-500 text-xs whitespace-nowrap">
+                      <td className="py-3 px-4 text-slate-600 text-xs whitespace-nowrap">
                         {formatDate(agent.createdAt)}
                       </td>
                     </tr>

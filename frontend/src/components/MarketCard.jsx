@@ -5,16 +5,22 @@ export default function MarketCard({ market, external, externalUrl, source }) {
   const navigate = useNavigate()
 
   if (!market) return null
-  const { id, question, yesPrice, noPrice, tradeCount, volume, resolvesAt, status } = market
+  const question = market.question || ''
+  const yesPrice = market.yesPrice ?? market.yes_price ?? 0.5
+  const noPrice = market.noPrice ?? market.no_price ?? 0.5
+  const tradeCount = market.tradeCount ?? market.trade_count ?? 0
+  const volume = market.totalVolume ?? market.total_volume ?? market.volume ?? null
+  const resolvesAt = market.resolvesAt ?? market.resolution_date ?? market.resolutionDate ?? null
+  const status = (market.status || 'open').toLowerCase()
   const isResolved = status === 'resolved' || status === 'closed'
-  const yesPercent = Math.round((yesPrice ?? 0.5) * 100)
+  const yesPercent = Math.round((typeof yesPrice === 'number' ? yesPrice : 0.5) * 100)
   const noPercent = 100 - yesPercent
 
   function handleClick() {
     if (external && externalUrl) {
       window.open(externalUrl, '_blank', 'noopener')
     } else {
-      navigate(`/markets/${id}`)
+      navigate(`/markets/${market.id}`)
     }
   }
 
@@ -80,7 +86,7 @@ export default function MarketCard({ market, external, externalUrl, source }) {
       {/* Footer */}
       <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <span className="text-xs text-slate-500">
-          <span className="text-slate-400 font-medium">{formatNumber(tradeCount ?? 0)}</span> trades
+          <span className="text-slate-400 font-medium">{formatNumber(tradeCount)}</span> trades
         </span>
         {volume != null && (
           <span className="text-xs text-slate-500">
