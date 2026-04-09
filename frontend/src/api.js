@@ -1,27 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
-// Transform snake_case keys to camelCase recursively
-function toCamel(str) {
-  return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
-}
-
-function transformKeys(obj) {
-  if (Array.isArray(obj)) return obj.map(transformKeys)
-  if (obj !== null && typeof obj === 'object' && !(obj instanceof Date)) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [toCamel(k), transformKeys(v)])
-    )
-  }
-  return obj
-}
-
-async function apiFetch(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, options)
+async function apiFetch(path) {
+  const res = await fetch(`${API_BASE}${path}`)
   if (!res.ok) {
     throw new Error(`API error ${res.status}: ${res.statusText}`)
   }
-  const data = await res.json()
-  return transformKeys(data)
+  return res.json()
 }
 
 export async function fetchMarkets(status) {
@@ -51,46 +35,36 @@ export async function fetchLeaderboard() {
 }
 
 export async function fetchActivity() {
-  const raw = await apiFetch('/api/activity')
-  // Flatten the nested activity data structure
-  return (Array.isArray(raw) ? raw : []).map(item => {
-    const d = item.data || {}
-    return {
-      id: d.tradeId || d.agentId || d.marketId || item.id,
-      type: item.type,
-      timestamp: item.createdAt,
-      createdAt: item.createdAt,
-      agentName: d.agent?.name || d.name || null,
-      agentId: d.agent?.id || d.agentId || null,
-      marketQuestion: d.market?.question || d.question || null,
-      marketId: d.market?.id || d.marketId || null,
-      side: d.side || null,
-      amount: d.amount || null,
-      shares: d.shares ? parseFloat(d.shares).toFixed(1) : null,
-      price: d.price || null,
-      description: d.description || item.description || null,
-      outcome: d.outcome || null,
-    }
-  })
+  return apiFetch('/api/activity')
 }
 
 export async function fetchRecentTrades() {
   return apiFetch('/api/trades/recent')
 }
 
-// ── Agent Loop Controls ──
-
-/** Trigger one full autonomous agent loop (all agents analyze → decide → trade) */
 export async function runAgentLoop() {
-  return apiFetch('/api/agents/run', { method: 'POST' })
+  const res = await fetch(`${API_BASE}/api/agents/run`, { method: 'POST' })
+  if (!res.ok) throw new Error(`API error ${res.status}`)
+  return res.json()
 }
 
-/** Sync live Polymarket markets into the internal system */
-export async function syncMarkets() {
-  return apiFetch('/api/markets/sync', { method: 'POST' })
+export async function registerAgent(name, description) {
+  const res = await fetch(`${API_BASE}/api/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.error || `API error ${res.status}`)
+  }
+  return res.json()
 }
 
-/** Get agent status with strategy info */
-export async function fetchAgentStatus() {
-  return apiFetch('/api/agents/status')
+export async function runExperiment(rounds = 5, memoryless = false) {
+  const params = new URLSearchParams({ rounds })
+  if (memoryless) params.append('memoryless', 'true')
+  const res = await fetch(`${API_BASE}/api/experiments/run?${params}`, { method: 'POST' })
+  if (!res.ok) throw new Error(`API error ${res.status}`)
+  return res.json()
 }
