@@ -1,41 +1,53 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const navLinks = [
-  { to: '/', label: 'Dashboard', icon: '⬡' },
-  { to: '/markets', label: 'Markets', icon: '◈' },
-  { to: '/agents', label: 'Agents', icon: '◉' },
-  { to: '/leaderboard', label: 'Leaderboard', icon: '△' },
-  { to: '/docs', label: 'API', icon: '⌘' },
+  { to: '/', label: 'Dashboard' },
+  { to: '/markets', label: 'Markets' },
+  { to: '/agents', label: 'Agents' },
+  { to: '/leaderboard', label: 'Leaderboard' },
+  { to: '/docs', label: 'API' },
 ]
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <nav className="sticky top-0 z-50 border-b" style={{
-      background: 'rgba(3,7,18,0.85)',
+    <nav className="sticky top-0 z-50 transition-all duration-300" style={{
+      background: scrolled ? 'rgba(3,7,18,0.92)' : 'rgba(3,7,18,0.75)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      borderColor: 'rgba(34,211,238,0.12)',
+      borderBottom: `1px solid ${scrolled ? 'rgba(34,211,238,0.12)' : 'rgba(34,211,238,0.06)'}`,
+      boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.3)' : 'none',
     }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
           <NavLink to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 relative"
-              style={{ background: 'linear-gradient(135deg, #22d3ee, #a78bfa)', boxShadow: '0 0 16px rgba(34,211,238,0.4)' }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 relative transition-shadow group-hover:shadow-lg"
+              style={{ background: 'linear-gradient(135deg, #22d3ee, #a78bfa)', boxShadow: '0 0 16px rgba(34,211,238,0.3)' }}>
               <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                 <polyline points="1,14 5,8 9,11 13,4 17,7" stroke="#030712" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
             <div className="flex items-baseline gap-0.5">
               <span className="text-white font-bold text-lg tracking-tight">Agents</span>
-              <span className="font-bold text-lg tracking-tight" style={{ color: '#22d3ee', textShadow: '0 0 12px rgba(34,211,238,0.5)' }}>Predict</span>
+              <span className="font-bold text-lg tracking-tight gradient-text">Predict</span>
             </div>
-            <div className="hidden sm:flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded text-xs" style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80' }}>
-              <span className="live-dot" style={{ width: 5, height: 5 }} />
+            <div className="hidden sm:flex items-center gap-1 ml-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider" style={{
+              background: 'rgba(74,222,128,0.08)',
+              border: '1px solid rgba(74,222,128,0.25)',
+              color: '#4ade80',
+            }}>
+              <span className="live-dot" style={{ width: 4, height: 4 }} />
               <span>LIVE</span>
             </div>
           </NavLink>
@@ -50,10 +62,14 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'text-cyan-400 bg-cyan-400/10 border border-cyan-400/30'
+                      ? 'text-cyan-400'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`
                 }
+                style={({ isActive }) => isActive ? {
+                  background: 'rgba(34,211,238,0.08)',
+                  border: '1px solid rgba(34,211,238,0.2)',
+                } : { border: '1px solid transparent' }}
               >
                 {label}
               </NavLink>
@@ -76,7 +92,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden border-t py-3 space-y-1" style={{ borderColor: 'rgba(34,211,238,0.1)' }}>
+          <div className="md:hidden py-3 space-y-1 animate-fadeIn" style={{ borderTop: '1px solid rgba(34,211,238,0.08)' }}>
             {navLinks.map(({ to, label }) => (
               <NavLink
                 key={to}
