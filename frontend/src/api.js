@@ -15,8 +15,8 @@ function transformKeys(obj) {
   return obj
 }
 
-async function apiFetch(path) {
-  const res = await fetch(`${API_BASE}${path}`)
+async function apiFetch(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, options)
   if (!res.ok) {
     throw new Error(`API error ${res.status}: ${res.statusText}`)
   }
@@ -76,4 +76,21 @@ export async function fetchActivity() {
 
 export async function fetchRecentTrades() {
   return apiFetch('/api/trades/recent')
+}
+
+// ── Agent Loop Controls ──
+
+/** Trigger one full autonomous agent loop (all agents analyze → decide → trade) */
+export async function runAgentLoop() {
+  return apiFetch('/api/agents/run', { method: 'POST' })
+}
+
+/** Sync live Polymarket markets into the internal system */
+export async function syncMarkets() {
+  return apiFetch('/api/markets/sync', { method: 'POST' })
+}
+
+/** Get agent status with strategy info */
+export async function fetchAgentStatus() {
+  return apiFetch('/api/agents/status')
 }

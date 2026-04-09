@@ -14,6 +14,7 @@ import leaderboardRoutes from './routes/leaderboard.js';
 import portfolioRoutes from './routes/portfolio.js';
 import activityRoutes from './routes/activity.js';
 import externalRoutes from './routes/external.js';
+import agentRunnerRoutes from './routes/agentRunner.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,6 +36,7 @@ app.use('/api', leaderboardRoutes);
 app.use('/api', portfolioRoutes);
 app.use('/api', activityRoutes);
 app.use('/api', externalRoutes);
+app.use('/api', agentRunnerRoutes);
 
 // Serve SKILL.md
 app.get('/public/SKILL.md', (req, res) => {
